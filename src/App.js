@@ -1,23 +1,28 @@
-import logo from './logo.svg';
+import { useState } from 'react'
+import { addItem } from './utils/firebase'
+
 import './App.css';
 
 function App() {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+
+  const onSaveClick = async () => {
+    await addItem(title, description)
+    setTitle('')
+    setDescription('')
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Todo app</h1>
+      <div>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="title"/>
+      </div>
+      <div>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="description" />
+      </div>
+      <button onClick={onSaveClick}>clicca</button>
     </div>
   );
 }
