@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore"; 
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -31,9 +32,13 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
 const DB_NAME = dbName || "test-db"
 
 export const addItem = async (title, description) => {
+  // const a = firebase.auth().currentUser
+  debugger
   try {
     const docRef = await addDoc(collection(db, DB_NAME), {
       title,
@@ -45,4 +50,27 @@ export const addItem = async (title, description) => {
     console.error("Error adding document: ", e);
   }
 }
+
+export const signUp = async (email, password) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+    debugger
+    return userCredential.user
+  } catch (e) {
+    console.log(e)
+    return null
+  }
+}
+
+export const signIn = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    debugger
+    return userCredential.user
+  } catch (e) {
+    console.log(e)
+    return null
+  }
+}
+
 
