@@ -25,12 +25,10 @@ const AuthForm = ({ onSubmitSuccess }) => {
     e.preventDefault()
     if(submitType === 'signin') {
       const user = await signIn(email, password)
-      debugger
       onSubmitSuccess(user)
     }
     if(submitType === 'signup') { 
       const user = await signUp(email, password)
-      debugger
       onSubmitSuccess(user)
     }
   }

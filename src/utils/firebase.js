@@ -33,16 +33,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const user = auth.currentUser;
 
 const DB_NAME = dbName || "test-db"
 
 export const addItem = async (title, description) => {
-  // const a = firebase.auth().currentUser
-  debugger
   try {
     const docRef = await addDoc(collection(db, DB_NAME), {
       title,
       description,
+      author_uid: user.uid
     });
     console.log("Document written with ID: ", docRef.id);
     return docRef
@@ -54,7 +54,6 @@ export const addItem = async (title, description) => {
 export const signUp = async (email, password) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-    debugger
     return userCredential.user
   } catch (e) {
     console.log(e)
@@ -65,7 +64,6 @@ export const signUp = async (email, password) => {
 export const signIn = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
-    debugger
     return userCredential.user
   } catch (e) {
     console.log(e)
