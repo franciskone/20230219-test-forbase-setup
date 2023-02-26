@@ -40,7 +40,6 @@ const COLLECTION_NAME = collectionName || "test-collection"
 
 export const addItem = async (title, description) => {
   try {
-    debugger
     const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       title,
       description,
