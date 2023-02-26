@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, onSnapshot, query, where } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -9,7 +9,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-const {
+export const {
   REACT_APP_apiKey: apiKey,
   REACT_APP_authDomain: authDomain,
   REACT_APP_projectId: projectId,
@@ -17,7 +17,9 @@ const {
   REACT_APP_messagingSenderId: messagingSenderId,
   REACT_APP_appId: appId,
   REACT_APP_measurementId: measurementId,
-  REACT_APP_dbName: dbName,
+  REACT_APP_collectionName: collectionName,
+  REACT_APP_testEmail: testEMail,
+  REACT_APP_testPw: testPW
 } = process.env
 
 const firebaseConfig = {
@@ -33,22 +35,44 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const user = auth.currentUser;
 
-const DB_NAME = dbName || "test-db"
+const COLLECTION_NAME = collectionName || "test-collection"
 
 export const addItem = async (title, description) => {
   try {
-    const docRef = await addDoc(collection(db, DB_NAME), {
+    debugger
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       title,
       description,
-      author_uid: user.uid
+      author_uid: auth.currentUser.uid
     });
-    console.log("Document written with ID: ", docRef.id);
+
     return docRef
   } catch (e) {
     console.error("Error adding document: ", e);
   }
+}
+
+export const getNotesLive = (onNewValue) => {
+  const q = query(
+    collection(db, COLLECTION_NAME),
+    where("author_uid", "==", auth.currentUser?.uid || null)
+  );
+  const unsub = onSnapshot(q, (querySnapshot) => {
+    const notes = [];
+    querySnapshot.forEach((doc) => {
+      const { title, description } = doc.data()
+
+      notes.push({
+        title,
+        description,
+      });
+    });
+
+    onNewValue(notes)
+  });
+
+  return unsub
 }
 
 export const signUp = async (email, password) => {

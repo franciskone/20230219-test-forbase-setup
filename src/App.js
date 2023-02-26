@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { addItem, signIn, signUp } from './utils/firebase'
+import { useState, useEffect } from 'react'
+import { addItem, signIn, signUp, getNotesLive, testEMail, testPW } from './utils/firebase'
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -8,6 +8,10 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -18,8 +22,8 @@ import './App.css';
 
 const AuthForm = ({ onSubmitSuccess }) => {
   const [submitType, setSubmitType] = useState('signin') // signin, signup
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState(testEMail || '')
+  const [password, setPassword] = useState(testPW || '')
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -118,6 +122,29 @@ const NoteForm = () => {
   );
 }
 
+const NoteList = () => {
+  const [notes, setNotes] = useState([])
+  useEffect(() => {
+    return getNotesLive(setNotes)
+  }, [])
+
+  return <>{notes.map(({ title, description }) => (
+    <Card sx={{ minWidth: 275 }} key={title}>
+      <CardContent>
+        <Typography variant="h5" component="div">
+          {title}
+        </Typography>
+        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+          {description}
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Button size="small">Learn More</Button>
+      </CardActions>
+    </Card>
+  ))}</>
+}
+
 function App() {
   const [user, setUser] = useState(null)
 
@@ -129,6 +156,7 @@ function App() {
           <AuthForm onSubmitSuccess={setUser} />
         ) : <>
           <NoteForm />
+          <NoteList />
           <pre>{JSON.stringify({uid: user.uid, email: user.email }, null, 2)}</pre>
         </>}
       </Container>
